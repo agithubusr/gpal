@@ -21,6 +21,10 @@ class MainActivity(var cOne: Int = 0, var cTwo: Int = 0, var cThree: Int = 0,
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
+        val pInfo = packageManager.getPackageInfo(packageName, 0)
+        val appName = resources.getString(R.string.app_name)
+        this.title = String.format("%s %s", appName, pInfo.versionName)
+
         val oneHexStr = resources.getString(R.string.one_hex)
         val oneHexTxt = findViewById(R.id.one_hex) as TextView
         oneHexTxt.setOnClickListener { view ->
@@ -37,6 +41,7 @@ class MainActivity(var cOne: Int = 0, var cTwo: Int = 0, var cThree: Int = 0,
             threeHexTxt.text = String.format("%s - %s", threeHexStr, ++cThree)
         }
 
+        val timerStr = resources.getString(R.string.chrono)
         val timerLabel = findViewById(R.id.timer_label) as TextView
         val timer = findViewById(R.id.timer) as Chronometer
         timerLabel.setOnClickListener { view ->
@@ -44,10 +49,12 @@ class MainActivity(var cOne: Int = 0, var cTwo: Int = 0, var cThree: Int = 0,
             if (timerOn) {
                 elapsed = now - timer.base
                 timer.stop()
+                timerLabel.text = String.format("%s %s:", timerStr, "Off")
                 timerOn = false
             } else {
                 timer.base = now - elapsed
                 timer.start()
+                timerLabel.text = String.format("%s %s:", timerStr, "On")
                 timerOn = true
             }
         }
