@@ -17,4 +17,20 @@
             android:text="Hello World!"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+
+
+    <View android:layout_width="fill_parent"
+          android:layout_height="5dp"
+          android:layout_marginTop="60dp"
+          android:background="#00ff00" />
+
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="100dp"
+              android:text="@string/message"
+              android:id="@+id/message"
+              android:layout_gravity="center_horizontal" />
+
 </RelativeLayout>
