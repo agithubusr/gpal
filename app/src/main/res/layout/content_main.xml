@@ -13,24 +13,40 @@
         tools:showIn="@layout/activity_main"
         tools:context="akira.gympal.MainActivity">
 
-    <TextView
-            android:text="Hello World!"
+    <TextView android:id="@+id/timer_label"
+              android:text="@string/chrono"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+    <Chronometer
+            android:id="@+id/timer"
+            android:layout_marginLeft="100dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-
+            android:layout_height="wrap_content" />
 
     <View android:layout_width="fill_parent"
           android:layout_height="5dp"
           android:layout_marginTop="60dp"
-          android:background="#00ff00" />
+          android:background="#00bfff" />
 
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginTop="100dp"
-              android:text="@string/message"
-              android:id="@+id/message"
+              android:text="@string/one_hex"
+              android:id="@+id/one_hex"
               android:layout_gravity="center_horizontal" />
 
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="140dp"
+              android:text="@string/two_hex"
+              android:id="@+id/two_hex"
+              android:layout_gravity="center_horizontal" />
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="180dp"
+              android:text="@string/three_hex"
+              android:id="@+id/three_hex"
+              android:layout_gravity="center_horizontal" />
 </RelativeLayout>

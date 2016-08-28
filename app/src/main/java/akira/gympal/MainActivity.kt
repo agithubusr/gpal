@@ -1,21 +1,56 @@
 package akira.gympal
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.View
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Chronometer
+import android.widget.TextView
 
-class MainActivity : AppCompatActivity() {
+class MainActivity(var cOne: Int = 0, var cTwo: Int = 0, var cThree: Int = 0,
+                   var timerOn: Boolean = false, var elapsed: Long = 0)
+    : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
+
+        val oneHexStr = resources.getString(R.string.one_hex)
+        val oneHexTxt = findViewById(R.id.one_hex) as TextView
+        oneHexTxt.setOnClickListener { view ->
+            oneHexTxt.text = String.format("%s - %s", oneHexStr, ++cOne)
+        }
+        val twoHexStr = resources.getString(R.string.two_hex)
+        val twoHexTxt = findViewById(R.id.two_hex) as TextView
+        twoHexTxt.setOnClickListener { view ->
+            twoHexTxt.text = String.format("%s - %s", twoHexStr, ++cTwo)
+        }
+        val threeHexStr = resources.getString(R.string.three_hex)
+        val threeHexTxt = findViewById(R.id.three_hex) as TextView
+        threeHexTxt.setOnClickListener { view ->
+            threeHexTxt.text = String.format("%s - %s", threeHexStr, ++cThree)
+        }
+
+        val timerLabel = findViewById(R.id.timer_label) as TextView
+        val timer = findViewById(R.id.timer) as Chronometer
+        timerLabel.setOnClickListener { view ->
+            val now = SystemClock.elapsedRealtime()
+            if (timerOn) {
+                elapsed = now - timer.base
+                timer.stop()
+                timerOn = false
+            } else {
+                timer.base = now - elapsed
+                timer.start()
+                timerOn = true
+            }
+        }
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { view ->
