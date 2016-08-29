@@ -29,7 +29,19 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
         val hTxt = findViewById(hex.vName) as TextView
         hTxt.setOnClickListener { view ->
             hTxt.text = String.format("%s - %s", hStr, hex.incr())
+            calcTotals()
         }
+    }
+
+    private fun calcTotals() {
+        val hexTotal = hexs.fold(0) { total, next -> total + next.count }
+        val attTotal = atts.fold(0) { total, next -> total + next.count }
+        val hStr = resources.getString(R.string.total_hex)
+        val hTxt = findViewById(R.id.total_hex) as TextView
+        hTxt.text = String.format("%s - %s", hStr, hexTotal)
+        val aStr = resources.getString(R.string.total_att)
+        val aTxt = findViewById(R.id.total_att) as TextView
+        aTxt.text = String.format("%s - %s", aStr, attTotal)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

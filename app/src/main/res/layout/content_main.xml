@@ -77,4 +77,20 @@
               android:textSize="20dp"
               android:id="@+id/three_att"
               android:layout_gravity="center_horizontal" />
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="250dp"
+              android:text="@string/total_hex"
+              android:textSize="20dp"
+              android:id="@+id/total_hex"
+              android:layout_gravity="center_horizontal" />
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="250dp"
+              android:layout_marginLeft="150dp"
+              android:text="@string/total_att"
+              android:textSize="20dp"
+              android:id="@+id/total_att"
+              android:layout_gravity="center_horizontal" />
 </RelativeLayout>

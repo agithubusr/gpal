@@ -3,7 +3,9 @@
     <string name="action_settings">Settings</string>
     <string name="chrono">Timer</string>
     <string name="att">Attempt</string>
+    <string name="total_att">AttTotal</string>
     <string name="one_hex">OneHex</string>
     <string name="two_hex">TwoHex</string>
     <string name="three_hex">ThreeHex</string>
+    <string name="total_hex">HexTotal</string>
 </resources>
