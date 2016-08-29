@@ -16,8 +16,21 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
     : AppCompatActivity() {
 
     private val hexs = listOf(
-        HexData(R.string.one_hex, R.id.one_hex), HexData(R.string.two_hex, R.id.two_hex),
+        HexData(R.string.one_hex, R.id.one_hex),
+        HexData(R.string.two_hex, R.id.two_hex),
         HexData(R.string.three_hex, R.id.three_hex))
+    private val atts = listOf(
+        HexData(R.string.att, R.id.one_att),
+        HexData(R.string.att, R.id.two_att),
+        HexData(R.string.att, R.id.three_att))
+
+    private fun handleHex(hex: HexData) {
+        val hStr = resources.getString(hex.sName)
+        val hTxt = findViewById(hex.vName) as TextView
+        hTxt.setOnClickListener { view ->
+            hTxt.text = String.format("%s - %s", hStr, hex.incr())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +42,8 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
         val appName = resources.getString(R.string.app_name)
         this.title = String.format("%s %s", appName, pInfo.versionName)
 
-        for (hex in hexs) {
-            val hStr = resources.getString(hex.sName)
-            val hTxt = findViewById(hex.vName) as TextView
-            hTxt.setOnClickListener { view ->
-                hTxt.text = String.format("%s - %s", hStr, hex.incr())
-            }
-        }
+        for (hex in hexs) { handleHex(hex) }
+        for (att in atts) { handleHex(att) }
 
         val timerStr = resources.getString(R.string.chrono)
         val timerLabel = findViewById(R.id.timer_label) as TextView
