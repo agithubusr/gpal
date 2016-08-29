@@ -1,7 +1,9 @@
 package akira.gympal
 
 import akira.gympal.akira.gympal.data.HexData
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.os.SystemClock
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -23,6 +25,7 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
         HexData(R.string.att, R.id.one_att),
         HexData(R.string.att, R.id.two_att),
         HexData(R.string.att, R.id.three_att))
+    private var prefs: SharedPreferences? = null
 
     private fun handleHex(hex: HexData) {
         val hStr = resources.getString(hex.sName)
@@ -31,6 +34,7 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
             hTxt.text = String.format("%s - %s", hStr, hex.incr())
             calcTotals()
         }
+        hTxt.text = String.format("%s - %s", hStr, hex.count)
     }
 
     private fun calcTotals() {
@@ -46,6 +50,12 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
+
+        System.out.println("oncreate with: " + savedInstanceState)
+        System.out.println("pref: " + prefs?.getInt("xxx", 0))
+
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
@@ -74,6 +84,9 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
                 timerOn = true
             }
         }
+        // do state stuff...
+//        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
+
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { view ->
@@ -98,5 +111,35 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+
+//    override fun onPause() {
+//        super.onPause();
+//
+//        System.out.println("pausing...")
+//    }
+    override fun onStop() {
+        super.onStop();
+        val ed = prefs?.edit()
+        ed?.putInt("xxx", 999)
+        ed?.commit()
+
+        System.out.println("stopping...")
+    }
+    override fun onDestroy() {
+        super.onDestroy();
+
+        System.out.println("destroying...")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        System.out.println("save called... " + outState)
+    }
+
+    override fun onBackPressed() {
+        System.out.println("back...")
+        super.onBackPressed()
     }
 }
