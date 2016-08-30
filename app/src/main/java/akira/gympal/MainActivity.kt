@@ -11,10 +11,11 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Chronometer
 import android.widget.TextView
 
-class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
+class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useSavedState: Boolean = false)
     : AppCompatActivity() {
 
     private val hexs = listOf(
@@ -34,6 +35,19 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
             hTxt.text = String.format("%s - %s", hStr, hex.incr())
             calcTotals()
         }
+        // set count from prefs if possible
+        val prevCount = prefs?.getInt(hex.vName.toString(), hex.count) ?: hex.count
+        if (useSavedState) {
+            hex.count = prevCount // set this so totals are calculated property
+        }
+        hTxt.text = String.format("%s - %s", hStr, hex.count)
+    }
+
+    private fun resetHex(hex: HexData) {
+        val hStr = resources.getString(hex.sName)
+        val hTxt = findViewById(hex.vName) as TextView
+
+        hex.count = 0 // set this so totals are calculated property
         hTxt.text = String.format("%s - %s", hStr, hex.count)
     }
 
@@ -64,8 +78,14 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
         val appName = resources.getString(R.string.app_name)
         this.title = String.format("%s %s", appName, pInfo.versionName)
 
+        // start off w/ clock stuff as we check if timer was on here; ie; to use saved state
+        val now = SystemClock.elapsedRealtime()
+        val savedBase = prefs?.getLong(R.id.timer.toString(), now) ?: now
+        useSavedState = savedBase != -1L // set 'magic' var here...
+
         for (hex in hexs) { handleHex(hex) }
         for (att in atts) { handleHex(att) }
+        calcTotals() // set totals
 
         val timerStr = resources.getString(R.string.chrono)
         val timerLabel = findViewById(R.id.timer_label) as TextView
@@ -84,9 +104,28 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
                 timerOn = true
             }
         }
-        // do state stuff...
-//        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
+        // start clock w/ previous value
+        if (useSavedState) { // only reset if timer was on previously
+            timer.base = savedBase
+            timer.start()
+            timerLabel.text = String.format("%s %s:", timerStr, "On")
+            timerOn = true
+        }
 
+        // button
+        val button = findViewById(R.id.clear_btn) as Button
+        button.setOnClickListener { view ->
+            // reset timer
+            elapsed = 0
+            timer.base = SystemClock.elapsedRealtime()
+            timer.stop()
+            timerOn = false
+            timerLabel.text = String.format("%s %s:", timerStr, "Off")
+            // handle hexes etc...
+            for (hex in hexs) { resetHex(hex) }
+            for (att in atts) { resetHex(att) }
+            calcTotals() // set totals
+        }
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { view ->
@@ -122,7 +161,18 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0)
     override fun onStop() {
         super.onStop();
         val ed = prefs?.edit()
-        ed?.putInt("xxx", 999)
+
+        // save info
+        for (hex in hexs) { hex.putCount(ed) }
+        for (att in atts) { att.putCount(ed) }
+        val timer = findViewById(R.id.timer) as Chronometer
+        // only correct if timer
+        if (timerOn) {
+            ed?.putLong(R.id.timer.toString(), timer.base)
+        } else {
+            ed?.putLong(R.id.timer.toString(), -1L) // magic #
+        }
+
         ed?.commit()
 
         System.out.println("stopping...")

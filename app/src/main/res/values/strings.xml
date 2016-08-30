@@ -8,4 +8,5 @@
     <string name="two_hex">TwoHex</string>
     <string name="three_hex">ThreeHex</string>
     <string name="total_hex">HexTotal</string>
+    <string name="clear_btn">Clear</string>
 </resources>

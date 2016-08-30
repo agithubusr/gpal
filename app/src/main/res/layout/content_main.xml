@@ -93,4 +93,11 @@
               android:textSize="20dp"
               android:id="@+id/total_att"
               android:layout_gravity="center_horizontal" />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="300dp"
+            android:id="@+id/clear_btn"
+            android:text="@string/clear_btn" />
 </RelativeLayout>
