@@ -17,7 +17,7 @@ import android.widget.TextView
 class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useSavedState: Boolean = false)
     : AppCompatActivity() {
 
-    private val hexs = listOf(
+    val hexs = listOf(
         HexData(R.string.one_hex, R.id.one_hex),
         HexData(R.string.two_hex, R.id.two_hex),
         HexData(R.string.three_hex, R.id.three_hex),
@@ -28,11 +28,7 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
 
     private fun initHex(hex: HexData) {
         hex.init(this)
-        hex.view?.setOnClickListener { view ->
-            hex.incr()
-            hex.setText()
-            calcTotals()
-        }
+
         // set count from prefs if possible
         val prevCount = prefs?.getInt(hex.vName.toString(), hex.count) ?: hex.count
         if (useSavedState) {
@@ -41,20 +37,9 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         hex.setText()
     }
 
-    private fun calcTotals() {
-        val hexTotal = hexs.filter { !it.isAttempt }.fold(0) { total, next -> total + next.count }
-        val attTotal = hexs.filter { it.isAttempt }.fold(0) { total, next -> total + next.count }
-        val hStr = resources.getString(R.string.total_hex)
-        val hTxt = findViewById(R.id.total_hex) as TextView
-        hTxt.text = String.format("%s - %s", hStr, hexTotal)
-        val aStr = resources.getString(R.string.total_att)
-        val aTxt = findViewById(R.id.total_att) as TextView
-        aTxt.text = String.format("%s - %s", aStr, attTotal)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // must do this first
         prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
 
         setContentView(R.layout.activity_main)
@@ -70,8 +55,10 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         val savedBase = prefs?.getLong(R.id.timer.toString(), now) ?: now
         useSavedState = savedBase != -1L // set 'magic' var here...
 
-        for (hex in hexs) { initHex(hex) }
-        calcTotals() // set totals
+        for (hex in hexs) {
+            initHex(hex)
+            hex.calcTotals() // set totals -- figure out how to do this more efficiently
+        }
 
         val timerStr = resources.getString(R.string.chrono)
         val timerLabel = findViewById(R.id.timer_label) as TextView
@@ -108,8 +95,11 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
             timerOn = false
             timerLabel.text = String.format("%s %s:", timerStr, "Off")
             // handle hexes etc...
-            for (hex in hexs) { hex.reset() }
-            calcTotals() // set totals
+            for (hex in hexs) {
+                hex.reset()
+                hex.calcTotals() // set totals -- figure out how to do this more efficiently
+            }
+
         }
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
