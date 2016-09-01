@@ -3,7 +3,6 @@ package akira.gympal
 import akira.gympal.akira.gympal.data.HexData
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.os.SystemClock
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -21,18 +20,17 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
     private val hexs = listOf(
         HexData(R.string.one_hex, R.id.one_hex),
         HexData(R.string.two_hex, R.id.two_hex),
-        HexData(R.string.three_hex, R.id.three_hex))
-    private val atts = listOf(
-        HexData(R.string.att, R.id.one_att),
-        HexData(R.string.att, R.id.two_att),
-        HexData(R.string.att, R.id.three_att))
+        HexData(R.string.three_hex, R.id.three_hex),
+        HexData(R.string.att, R.id.one_att, true),
+        HexData(R.string.att, R.id.two_att, true),
+        HexData(R.string.att, R.id.three_att, true))
     private var prefs: SharedPreferences? = null
 
-    private fun handleHex(hex: HexData) {
-        val hStr = resources.getString(hex.sName)
-        val hTxt = findViewById(hex.vName) as TextView
-        hTxt.setOnClickListener { view ->
-            hTxt.text = String.format("%s - %s", hStr, hex.incr())
+    private fun initHex(hex: HexData) {
+        hex.init(this)
+        hex.view?.setOnClickListener { view ->
+            hex.incr()
+            hex.setText()
             calcTotals()
         }
         // set count from prefs if possible
@@ -40,20 +38,12 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         if (useSavedState) {
             hex.count = prevCount // set this so totals are calculated property
         }
-        hTxt.text = String.format("%s - %s", hStr, hex.count)
-    }
-
-    private fun resetHex(hex: HexData) {
-        val hStr = resources.getString(hex.sName)
-        val hTxt = findViewById(hex.vName) as TextView
-
-        hex.count = 0 // set this so totals are calculated property
-        hTxt.text = String.format("%s - %s", hStr, hex.count)
+        hex.setText()
     }
 
     private fun calcTotals() {
-        val hexTotal = hexs.fold(0) { total, next -> total + next.count }
-        val attTotal = atts.fold(0) { total, next -> total + next.count }
+        val hexTotal = hexs.filter { !it.isAttempt }.fold(0) { total, next -> total + next.count }
+        val attTotal = hexs.filter { it.isAttempt }.fold(0) { total, next -> total + next.count }
         val hStr = resources.getString(R.string.total_hex)
         val hTxt = findViewById(R.id.total_hex) as TextView
         hTxt.text = String.format("%s - %s", hStr, hexTotal)
@@ -66,9 +56,6 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         super.onCreate(savedInstanceState)
 
         prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
-
-        System.out.println("oncreate with: " + savedInstanceState)
-        System.out.println("pref: " + prefs?.getInt("xxx", 0))
 
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
@@ -83,8 +70,7 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         val savedBase = prefs?.getLong(R.id.timer.toString(), now) ?: now
         useSavedState = savedBase != -1L // set 'magic' var here...
 
-        for (hex in hexs) { handleHex(hex) }
-        for (att in atts) { handleHex(att) }
+        for (hex in hexs) { initHex(hex) }
         calcTotals() // set totals
 
         val timerStr = resources.getString(R.string.chrono)
@@ -122,8 +108,7 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
             timerOn = false
             timerLabel.text = String.format("%s %s:", timerStr, "Off")
             // handle hexes etc...
-            for (hex in hexs) { resetHex(hex) }
-            for (att in atts) { resetHex(att) }
+            for (hex in hexs) { hex.reset() }
             calcTotals() // set totals
         }
 
@@ -152,19 +137,12 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         return super.onOptionsItemSelected(item)
     }
 
-
-//    override fun onPause() {
-//        super.onPause();
-//
-//        System.out.println("pausing...")
-//    }
     override fun onStop() {
         super.onStop();
         val ed = prefs?.edit()
 
         // save info
         for (hex in hexs) { hex.putCount(ed) }
-        for (att in atts) { att.putCount(ed) }
         val timer = findViewById(R.id.timer) as Chronometer
         // only correct if timer
         if (timerOn) {
@@ -176,20 +154,5 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         ed?.commit()
 
         System.out.println("stopping...")
-    }
-    override fun onDestroy() {
-        super.onDestroy();
-
-        System.out.println("destroying...")
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        System.out.println("save called... " + outState)
-    }
-
-    override fun onBackPressed() {
-        System.out.println("back...")
-        super.onBackPressed()
     }
 }
