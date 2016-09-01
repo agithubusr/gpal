@@ -24,23 +24,10 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         HexData(R.string.att, R.id.one_att, true),
         HexData(R.string.att, R.id.two_att, true),
         HexData(R.string.att, R.id.three_att, true))
-    private var prefs: SharedPreferences? = null
-
-    private fun initHex(hex: HexData) {
-        hex.init(this)
-
-        // set count from prefs if possible
-        val prevCount = prefs?.getInt(hex.vName.toString(), hex.count) ?: hex.count
-        if (useSavedState) {
-            hex.count = prevCount // set this so totals are calculated property
-        }
-        hex.setText()
-    }
+    var prefs: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // must do this first
-        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
 
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
@@ -52,11 +39,13 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
 
         // start off w/ clock stuff as we check if timer was on here; ie; to use saved state
         val now = SystemClock.elapsedRealtime()
+        // must do this first, required in init
+        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
         val savedBase = prefs?.getLong(R.id.timer.toString(), now) ?: now
         useSavedState = savedBase != -1L // set 'magic' var here...
 
         for (hex in hexs) {
-            initHex(hex)
+            hex.init(this)
             hex.calcTotals() // set totals -- figure out how to do this more efficiently
         }
 
@@ -99,7 +88,6 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
                 hex.reset()
                 hex.calcTotals() // set totals -- figure out how to do this more efficiently
             }
-
         }
 
         val fab = findViewById(R.id.fab) as FloatingActionButton

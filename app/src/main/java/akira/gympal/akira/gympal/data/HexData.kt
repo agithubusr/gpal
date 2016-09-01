@@ -27,6 +27,12 @@ data class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = fals
             setText()
             calcTotals()
         }
+        // set count from prefs if possible
+        if (activity.useSavedState) {
+            val prevCount = activity.prefs?.getInt(vName.toString(), count) ?: count
+            count = prevCount // set this so totals are calculated property
+        }
+        setText()
     }
 
     fun setText() {
