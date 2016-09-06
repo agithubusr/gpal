@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.Chronometer
+import android.widget.TextView
 
 class MainActivity() : AppCompatActivity() {
 
@@ -28,7 +31,10 @@ class MainActivity() : AppCompatActivity() {
         this.title = String.format("%s %s", appName, pInfo.versionName)
 
         prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, 0)
-        time = TimeData(this, prefs!!) // must be created first as hexData uses useSaved field
+        time = TimeData(resources.getString(R.string.chrono),
+                findViewById(R.id.timer_label) as TextView,
+                findViewById(R.id.timer) as Chronometer,
+                findViewById(R.id.clear_btn) as Button, prefs!!) // must be created first as hexData uses useSaved field
         HexData.calcAll(this)
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
