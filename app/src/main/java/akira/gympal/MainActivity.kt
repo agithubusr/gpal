@@ -17,13 +17,6 @@ import android.widget.TextView
 class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useSavedState: Boolean = false)
     : AppCompatActivity() {
 
-    val hexs = listOf(
-        HexData(R.string.one_hex, R.id.one_hex),
-        HexData(R.string.two_hex, R.id.two_hex),
-        HexData(R.string.three_hex, R.id.three_hex),
-        HexData(R.string.att, R.id.one_att, true),
-        HexData(R.string.att, R.id.two_att, true),
-        HexData(R.string.att, R.id.three_att, true))
     var prefs: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,10 +37,7 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         val savedBase = prefs?.getLong(R.id.timer.toString(), now) ?: now
         useSavedState = savedBase != -1L // set 'magic' var here...
 
-        for (hex in hexs) {
-            hex.init(this)
-            hex.calcTotals() // set totals -- figure out how to do this more efficiently
-        }
+        HexData.calcAll(this)
 
         val timerStr = resources.getString(R.string.chrono)
         val timerLabel = findViewById(R.id.timer_label) as TextView
@@ -83,11 +73,8 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
             timer.stop()
             timerOn = false
             timerLabel.text = String.format("%s %s:", timerStr, "Off")
-            // handle hexes etc...
-            for (hex in hexs) {
-                hex.reset()
-                hex.calcTotals() // set totals -- figure out how to do this more efficiently
-            }
+
+            HexData.recalcAll()
         }
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
@@ -120,7 +107,8 @@ class MainActivity(var timerOn: Boolean = false, var elapsed: Long = 0, var useS
         val ed = prefs?.edit()
 
         // save info
-        for (hex in hexs) { hex.putCount(ed) }
+        HexData.putAll(ed)
+
         val timer = findViewById(R.id.timer) as Chronometer
         // only correct if timer
         if (timerOn) {
