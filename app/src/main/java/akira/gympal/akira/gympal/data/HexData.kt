@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 import android.widget.TextView
 
 
-data class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = false, var count: Int = 0) {
+class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = false, var count: Int = 0) {
 
     companion object {
         private val all  =  listOf(
@@ -54,7 +54,7 @@ data class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = fals
             calcTotals()
         }
         // set count from prefs if possible
-        if (activity.useSavedState) {
+        if (activity.time!!.useSavedState) {
             val prevCount = activity.prefs?.getInt(vName.toString(), count) ?: count
             count = prevCount // set this so totals are calculated property
         }
