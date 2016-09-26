@@ -43,7 +43,7 @@ class HexData(val sName: Int, val vName: Int, var count: Int = 0) {
     }
 
     fun prep(activity: MainActivity) {
-        println("In prep...")
+        println("In hex data prep...")
 
         this.activity = activity
         view = activity.findViewById(vName) as TextView
@@ -54,8 +54,8 @@ class HexData(val sName: Int, val vName: Int, var count: Int = 0) {
             calcTotals()
         }
         // set count from prefs if possible
-        if (activity.time!!.useSavedState) {
-            val prevCount = activity.prefs?.getInt(vName.toString(), count) ?: count
+        val prevCount = activity.prefs?.getInt(vName.toString(), count) ?: 0
+        if (prevCount != 0) {
             count = prevCount // set this so totals are calculated property
         }
         setText()
