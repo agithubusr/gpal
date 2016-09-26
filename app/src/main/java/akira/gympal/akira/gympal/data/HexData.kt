@@ -6,16 +6,16 @@ import android.content.SharedPreferences
 import android.widget.TextView
 
 
-class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = false, var count: Int = 0) {
+class HexData(val sName: Int, val vName: Int, var count: Int = 0) {
 
     companion object {
         private val all  =  listOf(
             HexData(R.string.one_hex, R.id.one_hex),
             HexData(R.string.two_hex, R.id.two_hex),
             HexData(R.string.three_hex, R.id.three_hex),
-            HexData(R.string.att, R.id.one_att, true),
-            HexData(R.string.att, R.id.two_att, true),
-            HexData(R.string.att, R.id.three_att, true))
+            HexData(R.string.four_hex, R.id.four_hex),
+            HexData(R.string.five_hex, R.id.five_hex),
+            HexData(R.string.six_hex, R.id.six_hex))
 
         fun calcAll(mainActivity: MainActivity) {
             all.forEach { hex ->  hex.prep(mainActivity) }
@@ -26,7 +26,7 @@ class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = false, va
             all.forEach { hex -> hex.reset() }
             all.first().calcTotals()
         }
-        fun  putAll(ed: SharedPreferences.Editor?) {
+        fun putAll(ed: SharedPreferences.Editor?) {
             for (hex in all) { hex.putCount(ed) }
         }
     }
@@ -76,14 +76,9 @@ class HexData(val sName: Int, val vName: Int, val isAttempt: Boolean = false, va
 
     fun calcTotals() {
         val activity = this.activity!!
-        val hexTotal = all.filter { !it.isAttempt }.fold(0) { total, next -> total + next.count }
+        val hexTotal = all.fold(0) { total, next -> total + next.count }
         val hStr = activity.resources.getString(R.string.total_hex)
         val hTxt = activity.findViewById(R.id.total_hex) as TextView
         setText(hTxt, hStr, hexTotal)
-
-        val attTotal = all.filter { it.isAttempt }.fold(0) { total, next -> total + next.count }
-        val aStr = activity.resources.getString(R.string.total_att)
-        val aTxt = activity.findViewById(R.id.total_att) as TextView
-        setText(aTxt, aStr, attTotal)
     }
 }
